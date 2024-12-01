@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Javascript Subdomain Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+            font-size: 14px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #loading {
+            display: none;
+            color: #007bff;
+        }
+        #demo {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            overflow-wrap: break-word;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Subdomain Scanner by GhostSec</h1>
+
+    <input type="text" placeholder="Enter a domain (e.g., example.com)" id="myInput">
+    <button type="button" onclick="getInputValue();">Scan Subdomains</button>
+    <p id="loading">Loading... Please wait.</p>
+
+    <h2>Output:</h2>
+    <div id="demo"></div>
+
+    <script>
+        function getInputValue() {
+            var inputVal = document.getElementById("myInput").value.trim();
+
+            // Validasi input
+            if (!inputVal.match(/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
+                document.getElementById("demo").innerHTML = "<p class='error'>Invalid domain! Please enter a valid domain name (e.g., example.com).</p>";
+                return;
+            }
+
+            // Tampilkan indikator loading
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("demo").innerHTML = "";
+
+            // URL API dan opsi fetch
+            var url = "https://api.hackertarget.com/hostsearch/?q=" + inputVal;
+            var requestOptions = {
+                method: 'GET',
+                redirect: 'follow'
+            };
+
+            // Ambil data dari API
+            fetch(url, requestOptions)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("HTTP error! Status: " + response.status);
+                    }
+                    return response.text();
+                })
+                .then(result => {
+                    document.getElementById("loading").style.display = "none";
+                    if (result.trim() === "") {
+                        document.getElementById("demo").innerHTML = "<p class='error'>No data found for the domain. Try another domain!</p>";
+                    } else {
+                        document.getElementById("demo").innerText = result;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("demo").innerHTML = "<p class='error'>Error fetching data: " + error.message + "</p>";
+                });
+        }
+    </script>
+</body>
+</html>
